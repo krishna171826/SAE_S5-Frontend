@@ -31,7 +31,7 @@ src/
 │   ├── ui/           #   Briques de base : Button, Input, Modal, Card…
 │   └── layout/       #   Structure de page : Navbar, Footer, Layout…
 ├── pages/            # Une page = un écran de l'application (Home, Login…)
-├── features/         # Code d'un domaine métier précis (ex. auth/, profil/)
+├── features/         # Le code de chaque fonctionnalité (search/, visitor/…)
 ├── hooks/            # Hooks personnalisés génériques (useFetch, useAuth…)
 ├── services/         # Tous les appels au backend
 ├── context/          # Contextes React partagés (AuthContext…)
@@ -56,6 +56,130 @@ src/
 | Ajouter une image                                         | `assets/`                              |
 
 **`components/` ou `features/` ?** Si le composant ne sert qu'à un seul sujet (ex. `LoginForm`), il va dans `features/auth/`. S'il peut servir n'importe où (ex. `Button`), il va dans `components/ui/`.
+
+## `features/` : le code de l'application, rangé par sujet
+
+C'est ici que se trouvera **la plus grande partie du code**. Chaque fonctionnalité de l'application a son propre dossier, qui contient tout ce dont elle a besoin : ses composants, ses hooks et, si besoin, son contexte.
+
+### Pourquoi ranger par sujet ?
+
+Sans `features/`, le code de la recherche serait éparpillé dans `components/`, `hooks/` et `context/`, mélangé avec celui des autres sujets. Avec `features/`, quand on travaille sur la recherche, **tout est dans `features/search/`**. Chaque membre de l'équipe peut travailler sur son sujet sans toucher aux fichiers des autres.
+
+### Exemple : la recherche d'activités
+
+```
+src/features/search/
+├── SearchForm.jsx        # formulaire (lieu, catégories…)
+├── SearchResults.jsx     # liste des résultats
+├── ActivityCard.jsx      # affichage d'une activité
+├── ActivityMap.jsx       # carte avec les activités
+├── useSearch.js          # hook : appelle le service et gère chargement / erreur
+└── SearchContext.jsx     # (si besoin) état partagé entre ces composants
+```
+
+- **Les composants** affichent les données.
+- **Le hook** (`useSearch.js`) contient la logique : il appelle `services/searchService.js`, garde les résultats dans un `useState` et gère le chargement et les erreurs.
+- **La page** (`pages/Search.jsx`) ne fait qu'assembler les morceaux :
+
+```jsx
+// src/pages/Search.jsx
+import SearchForm from '../features/search/SearchForm.jsx'
+import SearchResults from '../features/search/SearchResults.jsx'
+
+export default function Search() {
+  return (
+    <>
+      <SearchForm />
+      <SearchResults />
+    </>
+  )
+}
+```
+
+### Règles
+
+- Un dossier par sujet, en minuscules : `features/search/`, `features/visitor/`, `features/categories/`.
+- Un fichier de `features/search/` n'importe **jamais** un fichier de `features/visitor/`. Si deux sujets ont besoin du même composant, il est générique : on le déplace dans `components/ui/`.
+- Les appels au backend restent dans `services/`, et les features les appellent.
+
+## `context/` : partager des données entre plusieurs pages
+
+### Le problème
+
+En React, une donnée passe normalement d'un composant parent à ses enfants par les **props**. Ça marche bien sur un ou deux niveaux. Mais si la Navbar, la page de recherche et la page profil ont toutes besoin de savoir **qui est le visiteur actuel**, il faudrait faire descendre cette donnée à travers tous les composants intermédiaires, même ceux qui ne s'en servent pas. C'est ce qu'on appelle le *prop drilling*.
+
+### La solution
+
+Un **contexte** est une boîte partagée. On y met la donnée **une seule fois**, tout en haut de l'application, et **n'importe quel composant** peut la lire ou la modifier directement, sans passer par les props.
+
+### Comment en créer un (3 étapes)
+
+**1. Créer le contexte**, ici pour le visiteur :
+
+```jsx
+// src/context/VisitorContext.jsx
+import { createContext, useContext, useState } from 'react'
+
+const VisitorContext = createContext(null)
+
+export function VisitorProvider({ children }) {
+  const [visitor, setVisitor] = useState(null)
+
+  return (
+    <VisitorContext.Provider value={{ visitor, setVisitor }}>
+      {children}
+    </VisitorContext.Provider>
+  )
+}
+
+export function useVisitor() {
+  return useContext(VisitorContext)
+}
+```
+
+- `VisitorProvider` est le composant qui **contient** la donnée (`visitor`) et la fonction pour la changer (`setVisitor`).
+- `useVisitor()` est le raccourci que les composants appellent pour y **accéder**.
+
+**2. Entourer l'application avec le Provider**, une seule fois, dans `main.jsx` :
+
+```jsx
+<VisitorProvider>
+  <App />
+</VisitorProvider>
+```
+
+Tout ce qui est à l'intérieur de `<App />` a maintenant accès au visiteur.
+
+**3. L'utiliser dans n'importe quel composant :**
+
+```jsx
+import { useVisitor } from '../context/VisitorContext.jsx'
+
+export default function Navbar() {
+  const { visitor } = useVisitor()
+  return <p>Bonjour {visitor ? visitor.name : 'invité'}</p>
+}
+```
+
+```jsx
+// ailleurs, après avoir créé le visiteur via le backend :
+const { setVisitor } = useVisitor()
+const newVisitor = await createVisitor(data)   // services/visitorService.js
+setVisitor(newVisitor)                         // toute l'appli est mise à jour
+```
+
+Quand `setVisitor` est appelé, **tous** les composants qui utilisent `useVisitor()` se mettent à jour automatiquement.
+
+### Quand utiliser un contexte (et quand ne pas le faire)
+
+| Situation                                                        | Solution                                      |
+| ---------------------------------------------------------------- | --------------------------------------------- |
+| Donnée utilisée dans un seul composant                           | `useState` dans ce composant                  |
+| Donnée passée d'un parent à son enfant direct                    | props                                         |
+| Donnée partagée entre les composants d'**une seule** feature     | contexte dans `features/<sujet>/`             |
+| Donnée utilisée **partout** dans l'appli (visiteur, thème…)      | contexte dans `context/`                      |
+
+À éviter : tout mettre dans un contexte « au cas où ». Chaque changement d'un contexte met à jour tous les composants qui l'utilisent. Un contexte doit donc rester petit et ne contenir que des données vraiment partagées. Dans `context/`, il y aura donc **peu de fichiers** : le gros du code reste dans `features/`.
 
 ## Conventions de nommage
 
