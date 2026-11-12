@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getCategories } from '../services/searchApi';
+import { useState, useEffect } from 'react';
+import { getCategories } from '../../services/searchApi';
 
 export default function SearchForm({ onSearchSubmit, isLoading }) {
   const [categories, setCategories] = useState([]);

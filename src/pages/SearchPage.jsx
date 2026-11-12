@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import SearchForm from '../components/SearchForm';
+import { useState } from 'react';
+import SearchForm from '../features/search/SearchForm';
 import { submitSearch } from '../services/searchApi';
 
 export default function SearchPage() {
@@ -24,8 +24,8 @@ export default function SearchPage() {
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Recherche interactive d'activités</h1>
+    <div className="p-8 font-sans">
+  <h1 className="text-2xl font-bold mb-4">Recherche interactive d'activités</h1>
       
       <SearchForm onSearchSubmit={handleSearchSubmit} isLoading={isLoading} />
 
