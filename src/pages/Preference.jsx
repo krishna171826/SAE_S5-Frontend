@@ -1,17 +1,18 @@
 import { useState } from "react"
 import { CATEGORIES, RAYONS, AMBIANCES } from "../constants/constant"
-import { ArrowRight } from "lucide-react";
-import { useVisitor } from "../hooks/useVisitor";
+import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useAddress } from "../hooks/useAddress";
+import usePreference from "../hooks/usePreference";
+import { useNavigate } from "react-router-dom";
+import { submitSearch } from "../services/searchApi";
 
 export default function Preference() {
 
-    const { visitor } = useVisitor();
+    const navigate = useNavigate();
     const { address } = useAddress();
-    const [afficherResultat, setAfficherResultat] = useState(false);
-    const [ambiance, setAmbiance] = useState(null);
-    const [rayon, setRayon] = useState(15);
-    const [listCategorie, setListCategorie] = useState([]);
+    const [chargement, setChargement] = useState(false);
+    const [erreur, setErreur] = useState('');
+    const { listCategorie, setListCategorie, ambiance, setAmbiance, rayon, setRayon } = usePreference()
     function toggleCategorie(c) {
         if (listCategorie.includes(c)) {
             setListCategorie(
@@ -22,8 +23,26 @@ export default function Preference() {
         setListCategorie(newlist);
 
     }
-    function handleValider() {
-        setAfficherResultat(true);
+    async function handleValider() {
+        setErreur('');
+        setChargement(true);
+        try {
+            const ambiancef = ambiance?.toLowerCase();
+
+            const pref = {
+                address: address,
+                radius: rayon * 1000,
+                indoor_outdoor: ambiancef,
+                category: listCategorie[0]
+            }
+            const res = await submitSearch(pref);
+            navigate(`/recommendations/${res.data.searchId}`)
+        } catch (err) {
+            console.error(err);
+            setErreur("Impossible de lancer la recherche. Vérifiez votre adresse et réessayez.");
+        } finally {
+            setChargement(false);
+        }
     }
     return (
         <div className="flex flex-col items-center justify-center h-full">
@@ -89,19 +108,18 @@ export default function Preference() {
             <button
                 type="button"
                 onClick={handleValider}
-                className="mt-6 flex items-center gap-3 rounded-full bg-lime-200 px-8 py-4 font-texte font-bold text-emerald-900 hover:bg-lime-300 transition"
+                disabled={chargement}
+                className="mt-6 flex items-center gap-3 rounded-full bg-lime-200 px-8 py-4 font-texte font-bold text-emerald-900 hover:bg-lime-300 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-                Voir mes recommandations
-                <ArrowRight className="w-5 h-5" />
+                {chargement ? "Recherche en cours…" : "Voir mes recommandations"}
+                {chargement
+                    ? <LoaderCircle className="w-5 h-5 animate-spin" />
+                    : <ArrowRight className="w-5 h-5" />}
             </button>
-            {afficherResultat && (
-                <div className="mt-6 w-full max-w-3xl rounded-xl bg-white p-4 font-texte text-sm text-emerald-900">
-                    <p><b>Prénom :</b> {visitor || 'vide'}</p>
-                    <p><b>Adresse :</b> {address || 'vide'}</p>
-                    <p><b>Catégories :</b> {listCategorie.join(', ') || 'vide'}</p>
-                    <p><b>Rayon :</b> {rayon} km</p>
-                    <p><b>Ambiance :</b> {ambiance || 'vide'}</p>
-                </div>
+            {erreur && (
+                <p className="mt-4 rounded-xl bg-red-50 px-4 py-2 font-texte text-sm font-semibold text-red-600">
+                    {erreur}
+                </p>
             )}
 
         </div>

@@ -3,8 +3,10 @@ import { useParams } from 'react-router-dom';
 import { getRecommendationResults } from '../services/recommendationService';
 import ActivityCard from '../features/search/ActivityCard';
 import logoSpotly from '../assets/logo-spotly.png';
+import { useVisitor } from "../hooks/useVisitor";
 
 export default function RecommendationsPage({ searchId: propSearchId }) {
+  const { visitor } = useVisitor();
   const { id: paramSearchId } = useParams();
   const searchId = propSearchId || paramSearchId || 1;
 
@@ -60,7 +62,7 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
       <div className="w-1/2 h-full bg-gray-50 flex flex-col p-8 overflow-y-auto">
 
         <div className="mb-6">
-          <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">BONJOUR AKSWIN</span>
+          <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">BONJOUR {visitor}</span>
           <div className="flex justify-between items-center mt-1">
             <h1 className="text-3xl font-extrabold text-gray-900">Résultats suggérés</h1>
             <span className="bg-emerald-100 text-emerald-800 font-semibold text-sm px-3 py-1 rounded-full">
@@ -73,21 +75,19 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
         <div className="bg-gray-200/60 p-1.5 rounded-full flex mb-6">
           <button
             onClick={() => setActiveTab('recommendations')}
-            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${
-              activeTab === 'recommendations'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
+            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${activeTab === 'recommendations'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Recommandations
           </button>
           <button
             onClick={() => setActiveTab('performances')}
-            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${
-              activeTab === 'performances'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
+            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${activeTab === 'performances'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Performances
           </button>
