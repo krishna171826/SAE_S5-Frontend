@@ -33,9 +33,13 @@ export default function Preference() {
                 address: address,
                 radius: rayon * 1000,
                 indoor_outdoor: ambiancef,
-                category: listCategorie
+                categories: listCategorie
             }
             const res = await submitSearch(pref);
+            if (!res.data.searchCenter?.latitude) {
+                setErreur("Adresse introuvable. Vérifiez votre adresse et réessayez.");
+                return;
+            }
             navigate(`/recommendations/${res.data.searchId}`, { state: { data: res.data } })
         } catch (err) {
             console.error(err);
