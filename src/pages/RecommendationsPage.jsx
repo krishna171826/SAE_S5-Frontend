@@ -73,21 +73,19 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
         <div className="bg-gray-200/60 p-1.5 rounded-full flex mb-6">
           <button
             onClick={() => setActiveTab('recommendations')}
-            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${
-              activeTab === 'recommendations'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
+            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${activeTab === 'recommendations'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Recommandations
           </button>
           <button
             onClick={() => setActiveTab('performances')}
-            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${
-              activeTab === 'performances'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
+            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all ${activeTab === 'performances'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Performances
           </button>

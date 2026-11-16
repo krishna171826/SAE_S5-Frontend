@@ -1,17 +1,16 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { CATEGORIES, RAYONS, AMBIANCES } from "../constants/constant"
 import { ArrowRight } from "lucide-react";
 import { useVisitor } from "../hooks/useVisitor";
 import { useAddress } from "../hooks/useAddress";
+import usePreference from "../hooks/usePreference";
 
 export default function Preference() {
 
     const { visitor } = useVisitor();
     const { address } = useAddress();
     const [afficherResultat, setAfficherResultat] = useState(false);
-    const [ambiance, setAmbiance] = useState(null);
-    const [rayon, setRayon] = useState(15);
-    const [listCategorie, setListCategorie] = useState([]);
+    const { listCategorie, setListCategorie, ambiance, setAmbiance, rayon, setRayon } = usePreference()
     function toggleCategorie(c) {
         if (listCategorie.includes(c)) {
             setListCategorie(
