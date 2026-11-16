@@ -10,15 +10,19 @@ export default function ActivityCard({ activity }) {
     ? (typeof categories[0] === 'string' ? categories[0] : categories[0].name)
     : (typeof categories === 'string' ? categories : 'Activité');
 
-  const formattedDistance = distance
-    ? distance >= 1000
-      ? `${(distance / 1000).toFixed(0)} km`
-      : `${Math.round(distance)} m`
-    : '9 km';
+  let formattedDistance = null;
+  if (distance !== undefined && distance !== null) {
+    if (distance >= 1000) {
+      formattedDistance = `${(distance / 1000).toFixed(1)} km`;
+    } else {
+      formattedDistance = `${Math.round(distance)} m`;
+    }
+  }
 
-  const formattedScore = score !== undefined && score !== null
-    ? `${score <= 1 ? Math.round(score * 100) : Math.round(score)}% pertinent`
-    : null;
+  let formattedScore = null;
+  if (score !== undefined && score !== null) {
+    formattedScore = `${Math.round(score)}/100`;
+  }
 
   return (
     <div className="bg-white rounded-3xl p-6 shadow-[6px_6px_0px_#3fa678] transition-transform hover:-translate-y-0.5 flex flex-col justify-between">
@@ -32,9 +36,11 @@ export default function ActivityCard({ activity }) {
                 ★ {formattedScore}
               </span>
             )}
-            <span className="bg-emerald-100 text-emerald-800 font-semibold text-xs px-3 py-1 rounded-full">
-              {formattedDistance}
-            </span>
+            {formattedDistance && (
+              <span className="bg-emerald-100 text-emerald-800 font-semibold text-xs px-3 py-1 rounded-full">
+                {formattedDistance}
+              </span>
+            )}
           </div>
         </div>
 

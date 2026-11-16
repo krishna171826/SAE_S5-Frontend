@@ -34,7 +34,7 @@ export default function RecommendationsPage() {
       <div className="w-1/2 h-full bg-gray-200 relative flex items-center justify-center">
         <iframe
           title="Carte des recommandations"
-          className="w-full h-full min-h-screen border-0 grayscale-[20%] contrast-[95%]"
+          className="w-full h-full min-h-screen border-0 grayscale-20 contrast-95"
           src="https://www.openstreetmap.org/export/embed.html?bbox=2.25,48.81,2.42,48.90&layer=mapnik"
         />
 
