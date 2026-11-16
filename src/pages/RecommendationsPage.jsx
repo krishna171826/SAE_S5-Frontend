@@ -3,8 +3,10 @@ import { useParams } from 'react-router-dom';
 import { getRecommendationResults } from '../services/recommendationService';
 import ActivityCard from '../features/search/ActivityCard';
 import logoSpotly from '../assets/logo-spotly.png';
+import { useVisitor } from "../hooks/useVisitor";
 
 export default function RecommendationsPage({ searchId: propSearchId }) {
+  const { visitor } = useVisitor();
   const { id: paramSearchId } = useParams();
   const searchId = propSearchId || paramSearchId || 1;
 
@@ -60,7 +62,7 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
       <div className="w-1/2 h-full bg-gray-50 flex flex-col p-8 overflow-y-auto">
 
         <div className="mb-6">
-          <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">BONJOUR AKSWIN</span>
+          <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">BONJOUR {visitor}</span>
           <div className="flex justify-between items-center mt-1">
             <h1 className="text-3xl font-extrabold text-gray-900">Résultats suggérés</h1>
             <span className="bg-emerald-100 text-emerald-800 font-semibold text-sm px-3 py-1 rounded-full">
