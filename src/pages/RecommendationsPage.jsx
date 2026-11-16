@@ -1,36 +1,21 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getRecommendationResults } from '../services/recommendationService';
+import { useState } from 'react';
 import ActivityCard from '../features/search/ActivityCard';
 import logoSpotly from '../assets/logo-spotly.png';
 import { useVisitor } from "../hooks/useVisitor";
+import { useLocation } from 'react-router-dom';
+import usePreference from '../hooks/usePreference';
 
-export default function RecommendationsPage({ searchId: propSearchId }) {
+export default function RecommendationsPage() {
+  const location = useLocation();
+  const data = location.state?.data
   const { visitor } = useVisitor();
-  const { id: paramSearchId } = useParams();
-  const searchId = propSearchId || paramSearchId || 1;
+  const { rayon } = usePreference();
 
-  const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const activities = data?.recommendations ?? [];
   const [activeTab, setActiveTab] = useState('recommendations');
+  const error = !data;
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getRecommendationResults(searchId);
-        setActivities(data);
-      } catch {
-        setError("Impossible de charger les recommandations.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [searchId]);
 
   return (
     <div className="flex h-screen w-full bg-gray-100 overflow-hidden relative">
@@ -66,7 +51,7 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
           <div className="flex justify-between items-center mt-1">
             <h1 className="text-3xl font-extrabold text-gray-900">Résultats suggérés</h1>
             <span className="bg-emerald-100 text-emerald-800 font-semibold text-sm px-3 py-1 rounded-full">
-              15 km
+              {rayon} km
             </span>
           </div>
         </div>
@@ -96,23 +81,16 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
         {/* Contenu selon l'onglet sélectionné */}
         {activeTab === 'recommendations' ? (
           <>
-            {/* Chargement */}
-            {loading && (
-              <div className="flex-1 flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600 mb-3"></div>
-                <p className="text-gray-500 text-sm">Chargement des résultats...</p>
-              </div>
-            )}
 
             {/* Erreur */}
-            {!loading && error && (
+            {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-2xl text-center my-auto">
-                <p className="text-sm font-medium">{error}</p>
+                <p className="text-sm font-medium">Aucune recherche en cours. Relancez une recherche depuis le questionnaire.</p>
               </div>
             )}
 
             {/* Résultats Vides */}
-            {!loading && !error && activities.length === 0 && (
+            {!error && activities.length === 0 && (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
                 <span className="text-3xl mb-2">🔍</span>
                 <p className="font-semibold text-gray-800">Aucun lieu trouvé dans cette zone</p>
@@ -121,7 +99,7 @@ export default function RecommendationsPage({ searchId: propSearchId }) {
             )}
 
             {/* Liste des activités */}
-            {!loading && !error && activities.length > 0 && (
+            {!error && activities.length > 0 && (
               <div className="space-y-5 pr-2">
                 {activities.map((activity, index) => (
                   <ActivityCard key={activity.id || index} activity={activity} />

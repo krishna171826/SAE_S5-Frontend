@@ -12,7 +12,7 @@ export default function Preference() {
     const { address } = useAddress();
     const [chargement, setChargement] = useState(false);
     const [erreur, setErreur] = useState('');
-    const { listCategorie, setListCategorie, ambiance, setAmbiance, rayon, setRayon } = usePreference()
+    const { listCategorie, setListCategorie, ambiance, setAmbiance, rayon, setRayon } = usePreference();
     function toggleCategorie(c) {
         if (listCategorie.includes(c)) {
             setListCategorie(
@@ -33,10 +33,10 @@ export default function Preference() {
                 address: address,
                 radius: rayon * 1000,
                 indoor_outdoor: ambiancef,
-                category: listCategorie[0]
+                category: listCategorie
             }
             const res = await submitSearch(pref);
-            navigate(`/recommendations/${res.data.searchId}`)
+            navigate(`/recommendations/${res.data.searchId}`, { state: { data: res.data } })
         } catch (err) {
             console.error(err);
             setErreur("Impossible de lancer la recherche. Vérifiez votre adresse et réessayez.");
