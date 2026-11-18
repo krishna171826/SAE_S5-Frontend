@@ -4,30 +4,46 @@ import logoSpotly from '../assets/logo-spotly.png';
 import { useVisitor } from "../hooks/useVisitor";
 import { useLocation } from 'react-router-dom';
 import usePreference from '../hooks/usePreference';
+import { useAddress } from '../hooks/useAddress';
 
 export default function RecommendationsPage() {
   const location = useLocation();
   const data = location.state?.data
   const { visitor } = useVisitor();
   const { rayon } = usePreference();
+  const { address } = useAddress();
 
 
   const activities = data?.recommendations ?? [];
   const [activeTab, setActiveTab] = useState('recommendations');
   const error = !data;
 
+  const searchCenter = data?.searchCenter;
+  const centerLatitude = Number(searchCenter?.latitude);
+  const centerLongitude = Number(searchCenter?.longitude);
+  const hasSearchCenter = Number.isFinite(centerLatitude) && Number.isFinite(centerLongitude);
+
+  const radiusMeters = Number(data?.radiusMeters ?? rayon * 1000);
+  const safeRadius = Number.isFinite(radiusMeters) && radiusMeters > 0 ? radiusMeters : 5000;
+  const latitudeDelta = safeRadius / 111320;
+  const longitudeDelta = safeRadius / (111320 * Math.max(Math.cos(centerLatitude * Math.PI / 180), 0.25));
+
+  const mapUrl = hasSearchCenter
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${centerLongitude - longitudeDelta},${centerLatitude - latitudeDelta},${centerLongitude + longitudeDelta},${centerLatitude + latitudeDelta}&layer=mapnik&marker=${centerLatitude},${centerLongitude}`
+    : 'https://www.openstreetmap.org/export/embed.html?bbox=2.25,48.81,2.42,48.90&layer=mapnik&marker=48.8566,2.3522';
+
 
   return (
     <div className="flex h-screen w-full bg-gray-100 overflow-hidden relative">
 
-      {/* Logo Spotly Flottant */}
+      {/* Logo RecSpot Flottant */}
       <div className="absolute top-4 left-4 z-10 bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-2.5 overflow-hidden">
         <img
           src={logoSpotly}
-          alt="Logo Spotly"
+          alt="Logo RecSpot"
           className="w-8 h-8 object-contain scale-[3]"
         />
-        <span className="font-bold text-gray-800">Spotly</span>
+        <span className="font-bold text-gray-800">RecSpot</span>
       </div>
 
       {/* Gauche : Carte */}
@@ -35,11 +51,12 @@ export default function RecommendationsPage() {
         <iframe
           title="Carte des recommandations"
           className="w-full h-full min-h-screen border-0 grayscale-20 contrast-95"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=2.25,48.81,2.42,48.90&layer=mapnik"
+          src={mapUrl}
         />
 
         <div className="absolute bottom-6 bg-white px-4 py-2 rounded-full shadow-md text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <span className="text-red-500">📍</span> Paris
+          <span className="text-red-500">📍</span>
+          {address || data?.searchAddress || 'Zone recherchée'}
         </div>
       </div>
 
@@ -109,9 +126,9 @@ export default function RecommendationsPage() {
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-white rounded-3xl shadow-sm">
-            <span className="text-3xl mb-2">📊</span>
-            <p className="font-semibold text-gray-800">Statistiques et performances</p>
-            <p className="text-xs text-gray-500 mt-1">Les métriques de calcul du moteur de recommandation seront affichées ici.</p>
+            <span className="text-3xl mb-2">😅</span>
+            <p className="font-semibold text-gray-800">Nothing to display for now</p>
+            <p className="text-xs text-gray-500 mt-1">this section is on the developpement </p>
           </div>
         )}
 
