@@ -1,6 +1,7 @@
 export default function ActivityCard({ activity }) {
   const {
     name,
+    address,
     categories = [],
     distance,
     score,
@@ -45,6 +46,9 @@ export default function ActivityCard({ activity }) {
         </div>
 
         <p className="text-gray-500 text-sm mb-6">{categoryName}</p>
+        {address && (
+          <p className="text-emerald-700 text-sm mt-2 mb-3"> {address}</p>
+        )}
       </div>
 
       <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-full flex items-center justify-center gap-2 transition-colors">
