@@ -36,7 +36,7 @@ export default function RecommendationsPage() {
   return (
     <div className="flex h-screen w-full bg-gray-100 overflow-hidden relative">
 
-      {/* Logo RecSpot Flottant */}
+      {/* Logo Spovo Flottant */}
       <div className="absolute top-4 left-4 z-10 bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-2.5 overflow-hidden">
         <img
           src={logoSpotly}
