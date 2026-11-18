@@ -101,10 +101,10 @@ src/
 ## Ce qui est fait
 
 ### Page d'accueil visiteur — `src/pages/Acceuil.jsx`
-Premier écran de **Spotly** : on demande son prénom au visiteur.
+Premier écran de **Spovo** : on demande son prénom au visiteur.
 
 - Image de fond plein écran (`public/background-image.jpg`) assombrie par un calque `bg-black/40`.
-- Logo + nom « Spotly » en haut à gauche (`public/logo.png`).
+- Logo + nom « Spovo » en haut à gauche (`public/logo.png`).
 - Titre « Comment vous appelez-vous ? » avec la police manuscrite.
 - Formulaire : icône utilisateur, champ prénom, bouton flèche (icônes `lucide-react`).
 
@@ -159,7 +159,7 @@ const [texte, setTexte] = useState('');         // useState → crochets [ ]
 - [ ] Supprimer le commentaire dupliqué « div pour le texte de bienvenue ».
 - [ ] Renommer pour suivre les conventions : `Acceuil` → `Accueil`, `vistorInput` / `setvisitorInput` → `prenom` / `setPrenom`, `visitorF` → `prenomPropre`.
 - [ ] Passer `Accueil` en `export default`, comme le demande la règle « Un composant = un fichier ».
-- [ ] `index.html` : le favicon `/favicon.svg` a été supprimé (le remplacer par le logo), mettre `lang="fr"` et le titre « Spotly ».
+- [ ] `index.html` : le favicon `/favicon.svg` a été supprimé (le remplacer par le logo), mettre `lang="fr"` et le titre « Spovo ».
 - [ ] `Dockerfile` : `node:18-alpine` est trop ancien pour Vite 8 (Node `20.19+` ou `22.12+` requis). Passer à `node:22-alpine`.
 - [ ] Commiter le travail en cours : rien n'est encore commité sur la branche `AcceuilVisiteur`.
 

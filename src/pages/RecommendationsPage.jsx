@@ -40,10 +40,10 @@ export default function RecommendationsPage() {
       <div className="absolute top-4 left-4 z-10 bg-white px-4 py-2 rounded-full shadow-md flex items-center gap-2.5 overflow-hidden">
         <img
           src={logoSpotly}
-          alt="Logo RecSpot"
+          alt="Logo Spotly"
           className="w-8 h-8 object-contain scale-[3]"
         />
-        <span className="font-bold text-gray-800">RecSpot</span>
+        <span className="font-bold text-gray-800">Spovo</span>
       </div>
 
       {/* Gauche : Carte */}
